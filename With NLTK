@@ -1,0 +1,38 @@
+import string
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import matplotlib.pyplot as plt
+import GetOldTweets3 as got
+
+
+def get_tweets():
+
+    tweetcriteria = got.manager.TweetCriteria().setQuerySearch('Coronavirus') \
+        .setSince("2020-01-01") \
+        .setUntil("2020-04-01") \
+        .setMaxTweets(100)
+
+    tweets = got.manager.TweetManager.getTweets(tweetcriteria)
+
+    text_tweets = [[tweet.text] for tweet in tweets]
+    return text_tweets
+
+text=""
+text_tweets=get_tweets()
+length=len(text_tweets)
+
+for i in range(0, length):
+    text = text_tweets[i][0] + " " + text
+
+
+lower_case = text.lower()
+cleaned_text = lower_case.translate(str.maketrans('', '', string.punctuation))
+def sentiment_analyser(sentiment_text):
+    analyser=SentimentIntensityAnalyzer().polarity_scores(sentiment_text)
+    fig, ax1 = plt.subplots()
+    ax1.bar(analyser.keys(), analyser.values())
+    fig.autofmt_xdate()
+    plt.savefig('graph.png')
+    plt.show()
+
+
+sentiment_analyser(cleaned_text)
